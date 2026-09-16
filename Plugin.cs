@@ -23,7 +23,6 @@ namespace BetterVeins
 
         public static ConfigEntry<bool> mergeDrops;
         public static ConfigEntry<bool> overstackDrops;
-        public static ConfigEntry<int> maxAreasPerVein;
 
         public static ConfigEntry<bool> debugMode;
 
@@ -106,11 +105,6 @@ namespace BetterVeins
             overstackDrops = ConfigSync("Drops", "Overstack Drops", false,
                 new ConfigDescription(
                     "Put everything into a single stack even when that is past what the item normally stacks to, so 200 stone is one pile rather than four. Off by default: an oversized stack does not fit an inventory slot cleanly, and one left on the ground stays oversized if you remove this mod."));
-
-            maxAreasPerVein = ConfigSync("Drops", "Max Chunks Per Deposit", 200,
-                new ConfigDescription(
-                    "Never take more than this many chunks from one deposit in a single swing. A safety net against a deposit larger than anything the game ships.",
-                    new AcceptableValueRange<int>(1, 1000)));
 
             debugMode = ConfigSync("Debug", "Debug Mode", false,
                 new ConfigDescription(

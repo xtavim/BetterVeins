@@ -6,8 +6,6 @@ namespace BetterVeins.Scripts
 {
     public static class Vein
     {
-        public const string RpcName = "BV_Break";
-
         private static readonly AccessTools.FieldRef<MineRock5, List<MineRock5.HitArea>> Areas =
             AccessTools.FieldRefAccess<MineRock5, List<MineRock5.HitArea>>("m_hitAreas");
 
@@ -24,17 +22,9 @@ namespace BetterVeins.Scripts
             AccessTools.MethodDelegate<System.Action<MineRock5>>(
                 AccessTools.Method(typeof(MineRock5), "SaveHealth"));
 
-        private static readonly System.Action<MineRock5> UpdateMesh =
-            AccessTools.MethodDelegate<System.Action<MineRock5>>(
-                AccessTools.Method(typeof(MineRock5), "UpdateMesh"));
-
         private static readonly System.Func<MineRock5, Collider, int> GetAreaIndex =
             AccessTools.MethodDelegate<System.Func<MineRock5, Collider, int>>(
                 AccessTools.Method(typeof(MineRock5), "GetAreaIndex"));
-
-        private static readonly System.Func<MineRock5, bool> AllDestroyed =
-            AccessTools.MethodDelegate<System.Func<MineRock5, bool>>(
-                AccessTools.Method(typeof(MineRock5), "AllDestroyed"));
 
         public static bool Sweeping;
 
@@ -75,14 +65,13 @@ namespace BetterVeins.Scripts
             if (areas == null || nview == null || !nview.IsValid() || !nview.IsOwner()) return;
 
             var centre = Centre(rock, hit, hitAreaIndex);
-            var cap = Plugin.maxAreasPerVein.Value;
 
             Sweeping = true;
             try
             {
                 var broken = 0;
 
-                for (var i = 0; i < areas.Count && broken < cap; i++)
+                for (var i = 0; i < areas.Count; i++)
                 {
                     if (Health(areas[i]) <= 0f) continue;
 
@@ -104,15 +93,10 @@ namespace BetterVeins.Scripts
                     PrivateArea.OnObjectDamaged(rock.transform.position, hit.GetAttacker(), true);
                 }
 
-                if (AllDestroyed(rock))
-                {
-                    nview.Destroy();
-                }
-                else
-                {
-                    nview.InvokeRPC(ZNetView.Everybody, RpcName, Pack(areas));
-                    UpdateMesh(rock);
-                }
+                // Every chunk that was standing is now at zero, so there is never anything left to
+                // show. The deposit goes, and every other player sees it go through the same path
+                // the game uses for a deposit mined by hand.
+                nview.Destroy();
 
                 if (Plugin.debugMode.Value)
                 {
@@ -154,43 +138,6 @@ namespace BetterVeins.Scripts
             }
 
             return true;
-        }
-
-        public static void Register(MineRock5 rock)
-        {
-            var nview = NView(rock);
-            if (nview == null || !nview.IsValid()) return;
-
-            nview.Register<ZPackage>(RpcName, (sender, pkg) => Apply(rock, pkg));
-        }
-
-        private static void Apply(MineRock5 rock, ZPackage pkg)
-        {
-            var areas = Areas(rock);
-            if (areas == null || pkg == null) return;
-
-            pkg.SetPos(0);
-
-            var count = pkg.ReadInt();
-
-            for (var i = 0; i < count; i++)
-            {
-                var health = pkg.ReadSingle();
-                if (i < areas.Count) Health(areas[i]) = health;
-            }
-
-            UpdateMesh(rock);
-        }
-
-        private static ZPackage Pack(List<MineRock5.HitArea> areas)
-        {
-            var pkg = new ZPackage();
-
-            pkg.Write(areas.Count);
-
-            foreach (var area in areas) pkg.Write(Health(area));
-
-            return pkg;
         }
 
         public static Vector3 Centre(MineRock5 rock, HitData hit, int hitAreaIndex)

@@ -69,7 +69,6 @@ Neither ever stops a deposit halfway. A pickaxe that runs out finishes the job a
 | --- | --- | --- |
 | Merge Drops | On | Add the drops up into full stacks in one spot, instead of one per chunk |
 | Overstack Drops | **Off** | Everything in a single stack even past the normal limit |
-| Max Chunks Per Deposit | 200 | Safety net against an absurdly large deposit |
 
 **On Overstack Drops:** an oversized stack does not fit an inventory slot cleanly, and one left on the ground stays oversized if you remove the mod. Left off, you get as few normal stacks as the item's stack limit allows, all sitting on the same spot — 200 stone is four stacks of fifty, not one of two hundred. Turn it on if you would rather have the single stack and can live with the caveats.
 
@@ -77,8 +76,8 @@ Neither ever stops a deposit halfway. A pickaxe that runs out finishes the job a
 
 - Built against **Valheim 1.0** (build 25185596).
 - Requires **BepInExPack Valheim 5.4.2350** or newer.
-- Install on both the client and the server. Settings are synchronized with ServerSync, and the server's values take precedence while **Lock Configuration** is enabled.
-- Only the person swinging needs the mod. Everyone else sees the deposit come down normally.
+- **Only the person swinging needs it.** Deposits come down through the game's own machinery, so other players see it happen normally whether or not they have the mod.
+- Install it on the server too if you want everyone playing by the same rules. Settings are synchronized with ServerSync and the server's values take precedence while **Lock Configuration** is enabled. Without it on the server, each player simply uses their own settings.
 - Removing the mod changes nothing permanently. Deposits and loot go back to vanilla behaviour.
 
 ## Changelog

@@ -5,12 +5,6 @@ namespace BetterVeins.Scripts
     [HarmonyPatch]
     public static class VeinPatches
     {
-        [HarmonyPostfix, HarmonyPatch(typeof(MineRock5), "Awake")]
-        private static void MineRock5_Awake_Postfix(MineRock5 __instance)
-        {
-            Vein.Register(__instance);
-        }
-
         [HarmonyPostfix, HarmonyPatch(typeof(MineRock), "Start")]
         private static void MineRock_Start_Postfix(MineRock __instance)
         {

@@ -56,14 +56,19 @@ client**. That last one is the stutter. Spreading the work over several frames, 
 is what the mods people complain about do, does not remove any of it.
 
 So the sweep does not break chunks. It reads the array once, zeroes every chunk that
-is still standing, writes the array once, and announces the result in a single
-message. The deposit ends up destroyed outright in the usual case, so the mesh is
-never rebuilt at all. **A deposit of forty chunks costs what one chunk costs.**
+is still standing, writes the array once, and destroys the deposit. The mesh is never
+rebuilt at all. **A deposit of forty chunks costs less than one chunk costs.**
 
-The one case that still needs the mesh is the chunk cap leaving something standing,
-and for that there is one custom RPC carrying the whole health array — the same
-shape `SaveHealth` writes — so every client rebuilds once. A client without the mod
-ignores a message it was never told about, so it degrades quietly.
+The sweep zeroes every chunk that was standing, so there is never anything left to
+show and never a reason to send anything of our own. The deposit is destroyed through
+the same path the game uses for one mined by hand, which is why a player without the
+mod sees it come down normally and why nothing here needs to be on the server.
+
+A cap on chunks per deposit used to guard against a deposit larger than anything the
+game ships. It was never reached, and it was the only thing that could leave a
+deposit half standing — which meant carrying a custom message, a health array packed
+into it, and a handler on every deposit in the world, all for a case that never
+happened. Removing it deleted all of that.
 
 ## Ownership
 

@@ -51,14 +51,13 @@ namespace BetterVeins.Scripts
             var zdo = nview.GetZDO();
             var full = rock.GetHealth();
             var centre = Centre(rock, hit, hitAreaIndex);
-            var cap = Plugin.maxAreasPerVein.Value;
 
             Sweeping = true;
             try
             {
                 var broken = 0;
 
-                for (var i = 0; i < areas.Length && broken < cap; i++)
+                for (var i = 0; i < areas.Length; i++)
                 {
                     if (areas[i] == null) continue;
                     if (zdo.GetFloat(Key(i), full) <= 0f) continue;
