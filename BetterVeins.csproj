@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="packages\ILMerge.3.0.41\build\ILMerge.props" Condition="Exists('packages\ILMerge.3.0.41\build\ILMerge.props')" />
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{7F3B2D91-4C6A-4E8B-9A15-2D8F6C41E7B3}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>BetterVeins</RootNamespace>
+        <AssemblyName>BetterVeins</AssemblyName>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+        <LangVersion>10</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <Choose>
+        <When Condition="($(OS) == 'Unix' OR $(OS) == 'OSX') AND $(GamePath) == ''">
+            <PropertyGroup>
+                <GamePath Condition="!Exists('$(GamePath)')">$(HOME)/.steam/steam/steamapps/common/Valheim</GamePath>
+                <GamePath Condition="!Exists('$(GamePath)')">$(HOME)/Library/Application Support/Steam/steamapps/common/Valheim/Contents/MacOS</GamePath>
+                <CorlibPath Condition="!Exists('$(CorlibPath)') AND Exists('$(GamePath)')">$(GamePath)\valheim_Data\Managed</CorlibPath>
+                <CorlibPath Condition="!Exists('$(CorlibPath)')">$(GamePath)/unstripped_corelib</CorlibPath>
+            </PropertyGroup>
+        </When>
+        <When Condition="($(OS) == 'Windows_NT') AND $(GamePath) == ''">
+            <PropertyGroup>
+                <GamePath Condition="!Exists('$(GamePath)')">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 892970', 'InstallLocation', null, RegistryView.Registry64, RegistryView.Registry32))</GamePath>
+                <_SteamLibraryPath>$([MSBuild]::GetRegistryValueFromView('HKEY_CURRENT_USER\SOFTWARE\Valve\Steam', 'SteamPath', null, RegistryView.Registry32))</_SteamLibraryPath>
+                <GamePath Condition="!Exists('$(GamePath)') AND '$(_SteamLibraryPath)' != ''">$(_SteamLibraryPath)\steamapps\common\Valheim</GamePath>
+                <GamePath Condition="!Exists('$(GamePath)') AND Exists('$(ValheimGamePath)')">$(ValheimGamePath)</GamePath>
+                <GamePath Condition="!Exists('$(GamePath)')">C:\Program Files\Steam\steamapps\common\Valheim</GamePath>
+                <GamePath Condition="!Exists('$(GamePath)')">C:\Program Files (x86)\Steam\steamapps\common\Valheim</GamePath>
+                <GamePath Condition="!Exists('$(GamePath)')">D:\SteamLibrary\steamapps\common\Valheim</GamePath>
+                <BepInExPath Condition="!Exists('$(BepInExPath)\core') AND Exists('$(GamePath)\BepInEx\core')">$(GamePath)\BepInEx</BepInExPath>
+                <!-- Gale and r2modman keep BepInEx in a profile of their own rather than in the game folder. -->
+                <BepInExPath Condition="!Exists('$(BepInExPath)\core') AND '$(GaleProfile)' != '' AND Exists('$(APPDATA)\com.kesomannen.gale\valheim\profiles\$(GaleProfile)\BepInEx\core')">$(APPDATA)\com.kesomannen.gale\valheim\profiles\$(GaleProfile)\BepInEx</BepInExPath>
+                <BepInExPath Condition="!Exists('$(BepInExPath)\core') AND Exists('$(APPDATA)\com.kesomannen.gale\valheim\profiles\Default\BepInEx\core')">$(APPDATA)\com.kesomannen.gale\valheim\profiles\Default\BepInEx</BepInExPath>
+                <BepInExPath Condition="!Exists('$(BepInExPath)\core') AND Exists('$(APPDATA)\r2modmanPlus-local\Valheim\profiles\Default\BepInEx\core')">$(APPDATA)\r2modmanPlus-local\Valheim\profiles\Default\BepInEx</BepInExPath>
+                <CorlibPath Condition="!Exists('$(CorlibPath)') AND Exists('$(GamePath)')">$(GamePath)\valheim_Data\Managed</CorlibPath>
+                <CorlibPath Condition="!Exists('$(CorlibPath)') AND Exists('$(GamePath)')">$(GamePath)\unstripped_corlib</CorlibPath>
+                <PublicizedAssembliesPath Condition="!Exists('$(PublicizedAssembliesPath)') AND Exists('$(GamePath)')">$(GamePath)\valheim_Data\Managed\publicized_assemblies</PublicizedAssembliesPath>
+                <AfterTargets Condition="'$(AfterTargets)' == ''">ILRepacker</AfterTargets>
+            </PropertyGroup>
+        </When>
+    </Choose>
+    <ItemGroup>
+        <Reference Include="0Harmony">
+            <HintPath>$(BepInExPath)\core\0Harmony.dll</HintPath>
+        </Reference>
+        <Reference Include="assembly_guiutils">
+          <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_guiutils_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="assembly_utils">
+          <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_utils_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="SoftReferenceableAssets">
+            <HintPath>$(GamePath)/valheim_Data/Managed/SoftReferenceableAssets.dll</HintPath>
+        </Reference>
+        <Reference Include="Splatform">
+            <HintPath>$(GamePath)/valheim_Data/Managed/Splatform.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+            <HintPath>$(GamePath)/valheim_Data/Managed/UnityEngine.UI.dll</HintPath>
+        </Reference>
+        <Reference Include="assembly_valheim">
+          <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_valheim_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="BepInEx">
+            <HintPath>$(BepInExPath)\core\BepInEx.dll</HintPath>
+        </Reference>
+        <Reference Include="ServerSync">
+            <HintPath>lib/ServerSync.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="netstandard">
+            <HintPath>$(GamePath)\valheim_Data\Managed\netstandard.dll</HintPath>
+        </Reference>
+        <Reference Include="System" />
+        <Reference Include="System.Core" />
+        <Reference Include="System.Data" />
+        <Reference Include="System.Xml" />
+        <Reference Include="UnityEngine">
+            <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule">
+            <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.PhysicsModule">
+            <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+        </Reference>
+        <Reference Include="Unity.TextMeshPro">
+            <HintPath>$(GamePath)\valheim_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="Plugin.cs" />
+        <Compile Include="scripts\NodeKinds.cs" />
+        <Compile Include="scripts\Vein.cs" />
+        <Compile Include="scripts\VeinRock.cs" />
+        <Compile Include="scripts\VeinDrops.cs" />
+        <Compile Include="scripts\VeinCost.cs" />
+        <Compile Include="scripts\VeinPatches.cs" />
+        <Compile Include="PluginInfo.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="App.config" />
+      <None Include="packages.config" />
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    
+    <!-- ILMerge disabled - use ILMerge.ps1 script manually after build for single DLL -->
+    <!-- Run: .\ILMerge.ps1 after building to merge ServerSync.dll into main DLL -->
+    
+    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+      <PropertyGroup>
+        <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+      </PropertyGroup>
+      <Error Condition="!Exists('packages\ILMerge.3.0.41\build\ILMerge.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ILMerge.3.0.41\build\ILMerge.props'))" />
+    </Target>
+
+    <!-- ServerSync is merged into the plugin so a single DLL ships to Thunderstore.
+         The input is the freshly compiled assembly in obj/ and the output overwrites the copy
+         in bin/, so the merge is idempotent and runs for every configuration, not just Debug. -->
+    <Target Name="MergeServerSync" AfterTargets="Build"
+            Condition="'$(OS)' == 'Windows_NT' AND Exists('$(ILMergeConsolePath)') AND Exists('lib/ServerSync.dll')">
+        <Exec Command="&quot;$(ILMergeConsolePath)&quot; /target:library /out:&quot;$(OutputPath)$(TargetFileName)&quot; /lib:&quot;$(CorlibPath)&quot; /lib:&quot;$(PublicizedAssembliesPath)&quot; /lib:&quot;$(BepInExPath)/core&quot; /closed &quot;@(IntermediateAssembly->'%(FullPath)')&quot; &quot;lib/ServerSync.dll&quot;" />
+        <Message Importance="high" Text="  $(AssemblyName) -> merged ServerSync into $(OutputPath)$(TargetFileName)" />
+    </Target>
+
+</Project>

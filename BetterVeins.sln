@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{7F3B2D91-4C6A-4E8B-9A15-2D8F6C41E7B3}") = "BetterVeins", "BetterVeins.csproj", "{C21A76F1-0082-494A-BBDD-4E97806726E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F3B2D91-4C6A-4E8B-9A15-2D8F6C41E7B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F3B2D91-4C6A-4E8B-9A15-2D8F6C41E7B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F3B2D91-4C6A-4E8B-9A15-2D8F6C41E7B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F3B2D91-4C6A-4E8B-9A15-2D8F6C41E7B3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

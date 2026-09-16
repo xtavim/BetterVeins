@@ -1,0 +1,9 @@
+{
+  "name": "BetterVeins",
+  "version_number": "1.0.0",
+  "description": "Break a whole deposit in one swing. Copper, silver, obsidian, scrap, plain rock - one chunk comes off and the rest goes with it, everything dropping in a neat stack at your feet. No lag, no stutter.",
+  "website_url": "https://github.com/xtavim/BetterVeins",
+  "dependencies": [
+    "denikson-BepInExPack_Valheim-5.4.2350"
+  ]
+}
