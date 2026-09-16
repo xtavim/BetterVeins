@@ -91,9 +91,35 @@ for eighty copper ore at a limit of thirty is three.
 That is worth more than tidiness. Every dropped object is a networked object with a
 ZDO of its own, and forty appearing in one frame is its own stutter.
 
-They land at the chunk the player actually hit rather than at the centre of the
-deposit, which puts them under the pickaxe and, usefully, on top of the drop vanilla
-already made for that first chunk.
+### Where they land
+
+Not at the chunk the player hit. That was the first idea, since it puts the loot under
+the pickaxe, and it is wrong: a flametal deposit standing in lava has chunks below the
+surface, and swinging at one of those put the entire deposit's ore under the lava,
+where it sinks out of reach. Vanilla gets away with spawning at the hit chunk because
+it spawns per chunk, so only that chunk's share is lost. Gathering everything into one
+place turns a fraction into all of it.
+
+So the anchor is the **highest chunk that was still standing**. A deposit has its top
+out of whatever it is standing in, or there would have been nothing to hit, which makes
+that the one point on it known to be reachable.
+
+From there the placement is `DropOnDestroyed`'s, the game's own pattern for putting a
+pile of items on the ground:
+
+- clamp to `ZoneSystem.GetGroundHeight` so nothing starts underground
+- lift half a metre
+- step each successive stack another three tenths higher, inside a half metre circle,
+  with a random facing
+
+The step matters as much as the height. Spawning several stacks at one point leaves
+their colliders inside each other, and physics resolves that by flinging them apart —
+which near a lava edge is its own way to lose the ore. A short column settles instead.
+
+Lava is not something the game models as a liquid: `LiquidType` knows water and tar and
+nothing else, so items do not float on it, and `ItemDrop.TerrainCheck` will helpfully
+push a sunk item down to the rock floor underneath it. There is no asking the game how
+high the lava is. Anchoring above it is the whole defence.
 
 ### Overstacking
 

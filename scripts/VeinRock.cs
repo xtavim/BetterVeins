@@ -57,10 +57,19 @@ namespace BetterVeins.Scripts
             {
                 var broken = 0;
 
+                var top = centre;
+                var topY = float.MinValue;
+
                 for (var i = 0; i < areas.Length; i++)
                 {
                     if (areas[i] == null) continue;
                     if (zdo.GetFloat(Key(i), full) <= 0f) continue;
+
+                    if (areas[i].bounds.center.y > topY)
+                    {
+                        topY = areas[i].bounds.center.y;
+                        top = areas[i].bounds.center;
+                    }
 
                     zdo.Set(Key(i), 0f);
                     broken++;
@@ -68,7 +77,7 @@ namespace BetterVeins.Scripts
 
                 if (broken == 0) return;
 
-                VeinDrops.Spawn(rock.m_dropItems, broken, centre, Vein.Cheated(hit));
+                VeinDrops.Spawn(rock.m_dropItems, broken, top, Vein.Cheated(hit));
                 VeinCost.Charge(hit, broken - alreadyPaid);
 
                 rock.m_destroyedEffect.Create(centre, Quaternion.identity);

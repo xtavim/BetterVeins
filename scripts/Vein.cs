@@ -71,9 +71,23 @@ namespace BetterVeins.Scripts
             {
                 var broken = 0;
 
+                // The loot is anchored to the highest chunk that was still standing, not the one the
+                // player swung at. A deposit sitting in lava or water has its top out of it, or there
+                // would have been nothing to hit, so this is the one point on the deposit known to be
+                // somewhere the loot can be picked up from again.
+                var top = centre;
+                var topY = float.MinValue;
+
                 for (var i = 0; i < areas.Count; i++)
                 {
                     if (Health(areas[i]) <= 0f) continue;
+
+                    var collider = AreaCollider(areas[i]);
+                    if (collider != null && collider.bounds.center.y > topY)
+                    {
+                        topY = collider.bounds.center.y;
+                        top = collider.bounds.center;
+                    }
 
                     Health(areas[i]) = 0f;
                     broken++;
@@ -83,7 +97,7 @@ namespace BetterVeins.Scripts
 
                 SaveHealth(rock);
 
-                VeinDrops.Spawn(rock.m_dropItems, broken, centre, Cheated(hit));
+                VeinDrops.Spawn(rock.m_dropItems, broken, top, Cheated(hit));
                 VeinCost.Charge(hit, broken - alreadyPaid);
 
                 rock.m_destroyedEffect.Create(centre, Quaternion.identity);
