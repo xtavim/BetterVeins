@@ -66,13 +66,25 @@ namespace BetterVeins.Scripts
 
         // One roll of the drop table per chunk, which is what vanilla would have done. Where the table
         // allows it, the per-chunk amounts are added up first and drawn in a single pass: the private
-        // overload picks that many items by weight and nothing carries between draws, so the result has
-        // the same distribution as rolling one chunk at a time and costs one list instead of forty.
-        // A table that drops one of each, or that can decline to drop at all, does carry state between
-        // draws, so those keep the honest loop.
+        // overload picks that many items by weight, each pick independent of the last, so adding the
+        // amounts up first gives the same distribution and costs one list instead of forty.
+        //
+        // Three things break that and send it back to the honest loop. One of each removes a drop from
+        // the running once it is picked. A drop chance below one is rolled per call, so one call would
+        // be one coin toss instead of forty. And a fractional resource rate makes the game scale the
+        // amount it was handed, which does not survive being handed the sum.
+        private static bool CanAddUp(DropTable table)
+        {
+            return RollExactly != null
+                   && !table.m_oneOfEach
+                   && table.m_dropChance >= 1f
+                   && Game.m_resourceRate >= 1f
+                   && Game.m_resourceRate % 1f == 0f;
+        }
+
         private static IEnumerable<GameObject> Roll(DropTable table, int areas)
         {
-            if (RollExactly == null || table.m_oneOfEach || table.m_dropChance < 1f || Game.m_resourceRate < 1f)
+            if (!CanAddUp(table))
             {
                 for (var i = 0; i < areas; i++)
                 {

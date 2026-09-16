@@ -93,16 +93,14 @@ ZDO of its own, and forty appearing in one frame is its own stutter.
 
 ### Where they land
 
-Not at the chunk the player hit. That was the first idea, since it puts the loot under
-the pickaxe, and it is wrong: a flametal deposit standing in lava has chunks below the
-surface, and swinging at one of those put the entire deposit's ore under the lava,
-where it sinks out of reach. Vanilla gets away with spawning at the hit chunk because
-it spawns per chunk, so only that chunk's share is lost. Gathering everything into one
-place turns a fraction into all of it.
+At the chunk the player hit, which puts the loot under the pickaxe and within reach of
+where they are standing.
 
-So the anchor is the **highest chunk that was still standing**. A deposit has its top
-out of whatever it is standing in, or there would have been nothing to hit, which makes
-that the one point on it known to be reachable.
+The highest standing chunk was tried instead, on the reasoning that a deposit in lava
+has its top out of the lava. It is a bad anchor: a flametal tower is many metres tall,
+so the loot appears overhead and rains down, bouncing wherever it lands. Reachable in
+theory, scattered in practice. The chunk the player swung at is the one place on the
+deposit they are demonstrably standing next to.
 
 From there the placement is `DropOnDestroyed`'s, the game's own pattern for putting a
 pile of items on the ground:
@@ -119,7 +117,9 @@ which near a lava edge is its own way to lose the ore. A short column settles in
 Lava is not something the game models as a liquid: `LiquidType` knows water and tar and
 nothing else, so items do not float on it, and `ItemDrop.TerrainCheck` will helpfully
 push a sunk item down to the rock floor underneath it. There is no asking the game how
-high the lava is. Anchoring above it is the whole defence.
+high the lava is, so nothing here can promise loot never goes in. Swinging at a chunk
+above the surface and putting the loot there, lifted and spread rather than heaped at
+one point, is as far as this can be taken.
 
 ### Overstacking
 
